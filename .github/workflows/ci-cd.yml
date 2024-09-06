@@ -18,22 +18,24 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Cache dependencies
+    - name: Cache node modules
       uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
       with:
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        path: node_modules
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package.json') }}
         restore-keys: |
           ${{ runner.OS }}-node-
 
     - name: Install dependencies
-      run: npm ci
+      run: yarn install
 
     - name: Run unit tests
-      run: npm test
+      run: yarn test
 
     - name: Build extension
-      run: npm run build
+      run: yarn build
 
     - name: Package extension
       run: |
