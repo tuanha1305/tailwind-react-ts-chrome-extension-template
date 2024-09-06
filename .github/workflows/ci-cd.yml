@@ -32,17 +32,23 @@ jobs:
       run: yarn install
 
     - name: Run unit tests
-      run: yarn test --passWithNoTests
+      run: yarn test
 
     - name: Build extension
       run: yarn build
 
+    - name: Get version and commit info
+      id: version
+      run: |
+        echo "pkg_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
     - name: Package extension
       run: |
-        zip -r chrome-extension.zip dist
+        zip -r chrome-extension-${{ steps.version.outputs.pkg_version }}-${{ steps.version.outputs.short_sha }}.zip dist
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: chrome-extension
-        path: chrome-extension.zip
+        name: chrome-extension-${{ steps.version.outputs.pkg_version }}-${{ steps.version.outputs.short_sha }}
+        path: chrome-extension-${{ steps.version.outputs.pkg_version }}-${{ steps.version.outputs.short_sha }}.zip
